@@ -1,0 +1,669 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Brief de Marca Chef</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..700&family=Instrument+Sans:wght@400..700&family=DM+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Source+Sans+3:wght@400&family=Sora:wght@600&family=DM+Sans:wght@400&family=Lora:wght@600&family=Nunito+Sans:wght@400&family=DM+Serif+Display&family=Karla:wght@400&family=Fredoka:wght@500&family=Nunito:wght@400&family=Kaushan+Script&family=Mulish:wght@400&display=swap">
+<style>
+/* Layout: cuestionario por pasos a la izquierda, maqueta viva de la marca a la derecha, cierre en forma de comanda de cocina. */
+:root {
+  --bg: #eef1ea; --surface: #ffffff; --ink: #1b2620; --muted: #56645b; --line: #cfd7cc;
+  --accent: #27674a; --accent-ink: #ffffff; --soft: #dfe9e0; --ticket: #fffdf4; --warn: #955008;
+  --display: "Bricolage Grotesque", "Trebuchet MS", sans-serif;
+  --body: "Instrument Sans", "Segoe UI", system-ui, sans-serif;
+  --mono: "DM Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #131a16; --surface: #1b2420; --ink: #e8eee9; --muted: #a0aea5; --line: #34423a;
+    --accent: #72c79e; --accent-ink: #0e1a14; --soft: #25352c; --ticket: #202a25; --warn: #e9ac63;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #131a16; --surface: #1b2420; --ink: #e8eee9; --muted: #a0aea5; --line: #34423a;
+  --accent: #72c79e; --accent-ink: #0e1a14; --soft: #25352c; --ticket: #202a25; --warn: #e9ac63;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font: 400 16px/1.55 var(--body); }
+.wrap {
+  max-width: 1160px; margin: 0 auto; padding-block: 32px 64px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: grid; gap: 24px;
+}
+h1, h2 { font-family: var(--display); font-weight: 650; line-height: 1.08; text-wrap: balance; margin: 0; }
+h1 { font-size: clamp(2.1rem, 5vw, 3.2rem); letter-spacing: -.02em; }
+h2 { font-size: clamp(1.6rem, 3.4vw, 2.1rem); letter-spacing: -.015em; outline: none; }
+.top { display: grid; gap: 10px; }
+.lead { margin: 0; max-width: 62ch; color: var(--muted); }
+.saved { font: 400 .8rem var(--mono); color: var(--muted); margin: 0; }
+.saved.bad { color: var(--warn); }
+
+.steps { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 6px; scrollbar-width: thin; }
+.steps button {
+  flex: 0 0 auto; display: flex; gap: 7px; align-items: baseline; padding: 7px 12px;
+  border: 1px solid var(--line); border-radius: 4px; background: transparent; color: var(--muted);
+  font: 500 .85rem var(--body); cursor: pointer;
+}
+.steps button span { font: 400 .75rem var(--mono); }
+.steps button:hover { border-color: var(--accent); color: var(--ink); }
+.steps button[aria-current="step"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+
+.grid { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 32px; align-items: start; }
+.panel { min-width: 0; display: grid; gap: 28px; }
+.head { display: grid; gap: 8px; }
+.eyebrow { font: 500 .75rem var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin: 0; }
+.head p:last-child { margin: 0; color: var(--muted); max-width: 62ch; }
+
+fieldset { border: 0; margin: 0; padding: 0; min-width: 0; }
+.field { display: grid; gap: 8px; min-width: 0; }
+.label, legend { font-weight: 600; padding: 0; display: block; }
+legend { margin-bottom: 8px; }
+.req { color: var(--warn); font: 400 .75rem var(--mono); margin-left: 6px; }
+.help { margin: 0; font-size: .875rem; color: var(--muted); max-width: 62ch; }
+legend + .help { margin-bottom: 10px; }
+input[type="text"], input[type="email"], input[type="tel"], input[type="url"], input[type="date"], textarea {
+  width: 100%; padding: 11px 12px; border: 1px solid var(--line); border-radius: 4px;
+  background: var(--surface); color: var(--ink); font: inherit;
+}
+textarea { min-height: 96px; resize: vertical; }
+::placeholder { color: var(--muted); opacity: .75; }
+input:focus-visible, textarea:focus-visible, button:focus-visible, a:focus-visible, pre:focus-visible {
+  outline: 2px solid var(--accent); outline-offset: 2px;
+}
+.card:has(input:focus-visible), .chip:has(input:focus-visible) { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip {
+  display: inline-flex; align-items: center; gap: 7px; padding: 7px 12px; cursor: pointer;
+  border: 1px solid var(--line); border-radius: 4px; background: var(--surface); font-size: .925rem;
+}
+.chip input, .card > input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.chip:hover, .card:hover { border-color: var(--accent); }
+.chip:has(input:checked) { background: var(--soft); border-color: var(--accent); font-weight: 600; }
+.chip:has(input:checked)::before { content: "✓"; color: var(--accent); }
+
+.scale { display: grid; gap: 14px; }
+.scale-row { display: grid; grid-template-columns: 1fr 1fr; gap: 2px 12px; font-size: .925rem; }
+.scale-row span:nth-child(2) { text-align: right; }
+.scale-row input { grid-column: 1 / -1; width: 100%; accent-color: var(--accent); }
+
+.cards { display: grid; gap: 10px; grid-template-columns: repeat(auto-fill, minmax(176px, 1fr)); }
+.card {
+  position: relative; display: grid; gap: 8px; align-content: start; padding: 12px; cursor: pointer; min-width: 0;
+  border: 1px solid var(--line); border-radius: 4px; background: var(--surface);
+}
+.card:has(input:checked) { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+.card b { font-size: .925rem; }
+.card small { color: var(--muted); font-size: .825rem; line-height: 1.35; }
+.logo-box { min-height: 104px; display: grid; place-items: center; border-radius: 3px; padding: 10px; overflow: hidden; }
+.swatches { display: flex; height: 44px; border-radius: 3px; overflow: hidden; border: 1px solid var(--line); }
+.swatches i { flex: 1; }
+.font-a { font-size: 1.45rem; line-height: 1.15; overflow-wrap: anywhere; }
+.font-b { font-size: .875rem; color: var(--muted); }
+.sym { display: grid; justify-items: center; text-align: center; }
+.sym svg { width: 34px; height: 34px; color: var(--accent); }
+
+.colors { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; }
+.color { display: flex; align-items: center; gap: 10px; padding: 8px; border: 1px solid var(--line); border-radius: 4px; background: var(--surface); }
+.color input { width: 38px; height: 38px; padding: 0; border: 0; background: none; cursor: pointer; flex: none; }
+.color div { min-width: 0; line-height: 1.25; font-size: .875rem; }
+.color code { font: 400 .75rem var(--mono); color: var(--muted); }
+
+.group { display: grid; gap: 8px; }
+.group + .group { margin-top: 18px; }
+.group h3 { margin: 0; font: 500 .75rem var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.check { display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 2px 8px; padding: 9px 12px; background: var(--surface); border: 1px solid var(--line); border-radius: 4px; cursor: pointer; }
+.check:has(input:checked) { border-color: var(--accent); }
+.check input { margin: 4px 0 0; width: 17px; height: 17px; accent-color: var(--accent); }
+.check b { font-weight: 600; font-size: .95rem; }
+.check small { grid-column: 2; color: var(--muted); font-size: .85rem; line-height: 1.35; }
+
+.nav { display: flex; flex-wrap: wrap; gap: 10px; justify-content: space-between; padding-top: 4px; }
+.btn {
+  padding: 12px 20px; border-radius: 4px; border: 1px solid var(--accent); cursor: pointer;
+  background: var(--accent); color: var(--accent-ink); font: 600 1rem var(--body);
+}
+.btn:hover { filter: brightness(1.08); }
+.btn.ghost { background: transparent; color: var(--ink); border-color: var(--line); }
+.btn.ghost:hover { border-color: var(--accent); }
+.btn.quiet { border-color: transparent; background: transparent; color: var(--muted); font-weight: 500; font-size: .875rem; padding-inline: 8px; }
+
+aside { position: sticky; top: calc(16px + env(safe-area-inset-top, 0px)); display: grid; gap: 8px; min-width: 0; }
+aside .note { margin: 0; font-size: .8rem; color: var(--muted); }
+.mock { border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+.mock-bar { display: flex; gap: 5px; padding: 8px 10px; background: var(--surface); border-bottom: 1px solid var(--line); align-items: center; }
+.mock-bar i { width: 8px; height: 8px; border-radius: 50%; background: var(--line); }
+.mock-bar span { margin-left: 8px; font: 400 .72rem var(--mono); color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.site { padding: 14px 16px 18px; display: grid; gap: 22px; }
+.site-nav { display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: .72rem; min-height: 44px; }
+.site-nav .logo-mini { min-width: 0; flex: 1; }
+.site-hero { display: grid; gap: 10px; }
+.site-hero h4 { margin: 0; font-size: 1.65rem; line-height: 1.12; overflow-wrap: anywhere; font-weight: inherit; }
+.site-hero p { margin: 0; font-size: .85rem; line-height: 1.45; opacity: .85; }
+.site-cta { justify-self: start; padding: 8px 14px; border-radius: 3px; font-size: .8rem; font-weight: 600; }
+.site-tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.site-tiles i { aspect-ratio: 1; border-radius: 3px; }
+
+.lg { display: inline-flex; align-items: center; gap: 8px; max-width: 100%; min-width: 0; line-height: 1.1; }
+.lg svg { flex: none; width: 1.7em; height: 1.7em; }
+.lg .nm { overflow-wrap: anywhere; min-width: 0; }
+.lg.mono { width: 2.5em; height: 2.5em; justify-content: center; border: 2px solid currentColor; border-radius: 3px; font-size: 1.15em; letter-spacing: .02em; }
+.lg.seal { flex-direction: column; justify-content: center; gap: 2px; width: 5.6em; height: 5.6em; border: 2px solid currentColor; border-radius: 50%; padding: .4em; text-align: center; font-size: .78em; }
+.lg.seal svg { width: 1.8em; height: 1.8em; }
+.lg.seal .nm { font-size: .78em; max-height: 2.3em; overflow: hidden; }
+.logo-mini .lg { font-size: .95rem; }
+.logo-mini .lg.seal { font-size: .5rem; }
+.logo-mini .lg.mono { font-size: .8rem; }
+
+.missing { border: 1px solid var(--warn); border-radius: 4px; padding: 12px 14px; display: grid; gap: 6px; }
+.missing p { margin: 0; color: var(--warn); font-weight: 600; }
+.missing button { background: none; border: 0; padding: 0; color: var(--ink); text-decoration: underline; cursor: pointer; font: inherit; text-align: left; }
+.ticket { background: var(--ticket); border: 1px solid var(--line); border-radius: 2px; padding: 18px 16px; display: grid; gap: 10px; }
+.ticket-head { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; border-bottom: 1px dashed var(--muted); padding-bottom: 8px; font: 500 .8rem var(--mono); letter-spacing: .06em; text-transform: uppercase; }
+.ticket pre { margin: 0; font: 400 .84rem/1.55 var(--mono); white-space: pre-wrap; overflow-wrap: anywhere; max-height: 460px; overflow: auto; }
+.send { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.status { margin: 0; min-height: 1.5em; font-size: .925rem; color: var(--accent); font-weight: 600; }
+.status.bad { color: var(--warn); }
+.how { margin: 0; padding-left: 1.2em; display: grid; gap: 4px; }
+
+@media (max-width: 900px) {
+  .wrap { padding-block: 20px 48px; }
+  .grid { grid-template-columns: minmax(0, 1fr); gap: 20px; }
+  aside { position: static; display: none; }
+  aside.on-phone { display: grid; order: -1; }
+  .site { gap: 14px; }
+  .site-tiles i { aspect-ratio: 3; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .chip, .card, .btn, .steps button { transition: border-color .15s, background-color .15s, filter .15s; }
+}
+</style>
+<style>body{margin:0}[hidden]{display:none!important}img{max-width:100%}</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="top">
+    <h1>Definamos su marca</h1>
+    <p class="lead">Con estas respuestas diseñamos su logo, sus colores y su página web. Toma unos 15 minutos. Si no sabe algo, déjelo en blanco y lo vemos juntos.</p>
+    <p class="saved" id="saved" aria-live="polite"></p>
+  </header>
+
+  <nav class="steps" id="steps" aria-label="Pasos del formulario"></nav>
+
+  <div class="grid">
+    <form class="panel" id="form" novalidate></form>
+    <aside id="aside" aria-label="Vista previa de la marca">
+      <div class="mock">
+        <div class="mock-bar"><i></i><i></i><i></i><span id="mock-url"></span></div>
+        <div class="site" id="site"></div>
+      </div>
+      <p class="note">Vista previa para imaginar la marca. No es el diseño final.</p>
+    </aside>
+  </div>
+</div>
+
+<script>
+const KEY = "brief-marca-chef-v1";
+
+const ICONS = {
+  gorro: '<path d="M7 14.5a4 4 0 1 1 1.3-7.8 4.5 4.5 0 0 1 7.4 0A4 4 0 1 1 17 14.5V20H7z"/><path d="M7 17h10"/>',
+  cubiertos: '<path d="M6 3v5a2.5 2.5 0 0 0 5 0V3M8.5 3v18"/><path d="M17.5 21V3c-2.5 1-3.5 4-3.5 7 0 2 1 3 3.500 3"/>',
+  fuego: '<path d="M12 3c1 4 6 6 6 11a6 6 0 0 1-12 0c0-2.500 1.500-4 2.500-5 .3 1.500 1 2.300 2 2.500C10 8.500 10.500 5.500 12 3z"/>',
+  hoja: '<path d="M5 19C4 10 10 4 20 4c0 10-6 16-15 15z"/><path d="M5 19l9-9"/>',
+  ola: '<path d="M3 10c3-3 6-3 9 0s6 3 9 0"/><path d="M3 16c3-3 6-3 9 0s6 3 9 0"/>',
+  pez: '<path d="M3 12c4-6 11-6 15 0-4 6-11 6-15 0z"/><path d="M18 12l3-3.500v7z"/><circle cx="8" cy="11" r=".8"/>'
+};
+const svg = n => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[n]}</svg>`;
+
+const SYMBOLS = [
+  { v: "gorro", l: "Gorro de chef" }, { v: "cubiertos", l: "Cubiertos" }, { v: "fuego", l: "Fuego o brasa" },
+  { v: "hoja", l: "Hoja o hierba" }, { v: "ola", l: "Ola o mar" }, { v: "pez", l: "Pescado" }
+];
+const LOGOS = [
+  { v: "logotipo", l: "Logotipo", d: "Solo el nombre, con letras propias." },
+  { v: "monograma", l: "Monograma", d: "Las iniciales. Funciona bien en la filipina." },
+  { v: "imagotipo", l: "Imagotipo", d: "Un símbolo junto al nombre." },
+  { v: "sello", l: "Sello", d: "Forma circular, como un emblema." }
+];
+const PALETTES = [
+  { v: "costa", l: "Costa y sal", c: ["#F2F8F8", "#12343B", "#1E7F8C", "#E9B44C"] },
+  { v: "selva", l: "Selva", c: ["#F2F4EA", "#1C2B20", "#2F5D3A", "#C9A227"] },
+  { v: "carbon", l: "Carbón y oro", c: ["#151515", "#F3EEE2", "#C8A24A", "#7C6332"] },
+  { v: "cacao", l: "Cacao", c: ["#F6EEE6", "#2E1A12", "#6B3A24", "#D08C3F"] },
+  { v: "citrico", l: "Cítrico", c: ["#FFFBEA", "#2A2A1F", "#D9650F", "#7CB518"] },
+  { v: "vino", l: "Vino", c: ["#FAF3F3", "#2B1320", "#7A1F3D", "#C8A97E"] },
+  { v: "mar", l: "Mar profundo", c: ["#0E1E2E", "#EAF1F6", "#4FB3BF", "#F2C14E"] },
+  { v: "minimal", l: "Blanco y negro", c: ["#FFFFFF", "#111111", "#111111", "#9A9A9A"] }
+];
+const FONTS = [
+  { v: "clasica", l: "Clásica elegante", a: "Playfair Display", b: "Source Sans 3", cat: "serif" },
+  { v: "moderna", l: "Moderna limpia", a: "Sora", b: "DM Sans", cat: "sans-serif" },
+  { v: "calida", l: "Cálida y cercana", a: "Lora", b: "Nunito Sans", cat: "serif" },
+  { v: "editorial", l: "Editorial con carácter", a: "DM Serif Display", b: "Karla", cat: "serif" },
+  { v: "fresca", l: "Fresca y amigable", a: "Fredoka", b: "Nunito", cat: "sans-serif" },
+  { v: "manuscrita", l: "Trazo a mano", a: "Kaushan Script", b: "Mulish", cat: "cursive" }
+];
+const COLOR_NAMES = ["Fondo", "Texto", "Principal", "Acento"];
+const SCREENS = [
+  { g: "Página pública", items: [
+    ["inicio", "Inicio con foto de portada", "Lo primero que ve el cliente: su mejor foto y su propuesta.", 1],
+    ["sobre", "Sobre el chef", "Su historia, su foto y su experiencia.", 1],
+    ["servicios", "Servicios", "Qué ofrece y cómo funciona.", 1],
+    ["menu", "Menús y paquetes", "Platos, opciones y precios.", 1],
+    ["galeria", "Galería de platos", "Fotos reales de su comida.", 1],
+    ["resenas", "Reseñas de clientes", "Comentarios y enlace a Google.", 1],
+    ["zona", "Zona de servicio con mapa", "Hasta dónde se desplaza.", 1],
+    ["reservas", "Reservas con calendario", "El cliente elige fecha y paquete y envía su solicitud.", 1],
+    ["whatsapp", "Botón flotante de WhatsApp", "Contacto directo desde cualquier pantalla.", 1],
+    ["faq", "Preguntas frecuentes", "Alergias, compras, cantidad de personas, pagos.", 0]
+  ]},
+  { g: "Para aparecer en Google", items: [
+    ["zonas", "Una página por cada zona", "Ayuda a que lo encuentren al buscar «private chef» más el nombre del lugar.", 1]
+  ]},
+  { g: "Su panel privado", items: [
+    ["admin-solicitudes", "Solicitudes de reserva", "Ver y responder lo que llega desde la página.", 1],
+    ["admin-calendario", "Calendario de fechas ocupadas", "Bloquear los días que no está disponible.", 1],
+    ["admin-paquetes", "Editor de paquetes y precios", "Cambiar menús y precios sin depender de nadie.", 1]
+  ]},
+  { g: "Extras", items: [
+    ["blog", "Blog o recetas", "Publicaciones que usted mantiene al día.", 0],
+    ["pagos", "Pago o depósito en línea", "Cobrar desde la página al reservar.", 0],
+    ["regalo", "Tarjetas de regalo", "Experiencias para regalar.", 0],
+    ["clases", "Clases de cocina", "Pantalla propia con fechas y cupos.", 0]
+  ]}
+];
+const SCALES = [
+  ["s_estilo", "Clásico", "Moderno"], ["s_trato", "Formal", "Cercano"], ["s_nivel", "Lujoso", "Accesible"],
+  ["s_textura", "Rústico", "Refinado"], ["s_voz", "Discreto", "Llamativo"]
+];
+
+const STEPS = [
+  { nav: "Negocio", title: "Su negocio", intro: "Los datos básicos que aparecerán en la página.", fields: [
+    { k: "marca", t: "text", label: "Nombre de la marca", req: 1, ph: "Ej.: Sal y Brasa Private Chef", help: "Si aún no lo decide, escriba las opciones que tiene." },
+    { k: "chef", t: "text", label: "Su nombre completo", req: 1 },
+    { k: "whatsapp", t: "tel", label: "WhatsApp para clientes", req: 1, ph: "+506 0000-0000" },
+    { k: "correo", t: "email", label: "Correo del negocio" },
+    { k: "base", t: "text", label: "¿Dónde está su base?", ph: "Ciudad o zona" },
+    { k: "zonas_texto", t: "area", label: "¿Hasta dónde se desplaza?", help: "Escriba los lugares donde cocina y los que no atiende." },
+    { k: "redes", t: "area", label: "Sus redes sociales", ph: "Instagram, Facebook, TikTok…", help: "Pegue los enlaces o los nombres de usuario." },
+    { k: "dominio", t: "radio", label: "Dirección web (dominio)", options: ["Ya tengo uno", "Necesito uno", "No sé qué es"] },
+    { k: "dominio_txt", t: "text", label: "¿Cuál es, o cuál le gustaría?", ph: "minombre.com", show: s => s.dominio && s.dominio !== "No sé qué es" },
+    { k: "google", t: "radio", label: "¿Tiene Perfil de Empresa en Google?", help: "Es la ficha con reseñas que sale en Google y Maps.", options: ["Sí", "No", "No estoy seguro"] }
+  ]},
+  { nav: "Clientes", title: "Sus clientes y su cocina", intro: "La marca se diseña para quien le compra. Entre más concreto, mejor.", fields: [
+    { k: "clientes", t: "multi", label: "¿Quién es su cliente ideal?", other: 1, options: ["Turistas en villas", "Familias de vacaciones", "Parejas y lunas de miel", "Grupos de amigos", "Residentes extranjeros", "Clientes locales", "Empresas", "Bodas y eventos", "Yates"] },
+    { k: "servicios", t: "multi", label: "¿Qué servicios ofrece?", other: 1, options: ["Cenas privadas", "Desayunos", "Almuerzos", "Chef por varios días", "Comidas preparadas", "Clases de cocina", "Catering", "Barbacoa"] },
+    { k: "cocina", t: "area", label: "¿Qué tipo de cocina hace y cuáles son sus platos estrella?" },
+    { k: "diferencia", t: "area", label: "¿Por qué un cliente debería elegirlo a usted y no a otro chef?", req: 1, help: "Su experiencia, su técnica, sus ingredientes, su trato. Lo que le dicen sus clientes." },
+    { k: "historia", t: "area", label: "Cuéntenos su historia", help: "Dónde aprendió, dónde ha trabajado y por qué cocina. Se usará en la pantalla «Sobre el chef»." },
+    { k: "precios", t: "radio", label: "¿Cómo se ubican sus precios?", options: ["Accesibles", "Intermedios", "Premium", "Lujo"] },
+    { k: "competencia", t: "area", label: "¿Qué otros chefs o negocios compiten con usted?", help: "Nombres o enlaces, si los conoce." }
+  ]},
+  { nav: "Personalidad", title: "Personalidad de la marca", intro: "Si su marca fuera una persona, ¿cómo sería y cómo hablaría?", fields: [
+    { k: "palabras", t: "text", label: "Tres palabras que describan su marca", req: 1, ph: "Ej.: fresca, honesta, costera" },
+    { k: "escala", t: "scale", label: "Mueva cada barra hacia donde está su marca" },
+    { k: "sentir", t: "area", label: "¿Qué debe sentir el cliente al terminar la cena?" },
+    { k: "eslogan", t: "text", label: "¿Tiene un eslogan o una frase?", ph: "Aparecerá en la vista previa", help: "Si no tiene, lo proponemos nosotros." },
+    { k: "idiomas", t: "multi", label: "¿En qué idiomas debe estar la página?", other: 1, options: ["Español", "Inglés"] },
+    { k: "trato", t: "radio", label: "¿Cómo le habla la marca al cliente en español?", options: ["De usted", "De vos", "De tú"] },
+    { k: "evitar_palabras", t: "text", label: "¿Algo que su marca nunca debería parecer?", ph: "Ej.: acartonada, barata, demasiado seria" }
+  ]},
+  { nav: "Logo", title: "Su logo", intro: "Las muestras usan el nombre que escribió. Son ejemplos del tipo de logo, no el diseño final.", preview: 1, fields: [
+    { k: "logo_estado", t: "radio", label: "¿En qué punto está?", options: ["Tengo logo y lo conservo", "Tengo logo y quiero mejorarlo", "Necesito uno desde cero"] },
+    { k: "logo", t: "logo", label: "¿Qué tipo de logo le atrae más?" },
+    { k: "simbolo", t: "symbol", label: "¿Qué símbolo lo representa mejor?", help: "Si no aparece el suyo, descríbalo abajo." },
+    { k: "logo_ideas", t: "area", label: "Ideas para el logo", ph: "Un animal, un lugar, un recuerdo, un ingrediente…", help: "Algo con significado para usted. También lo que no quiere ver." },
+    { k: "logo_usos", t: "multi", label: "¿Dónde usará el logo?", other: 1, options: ["Página web", "Redes sociales", "Filipina o delantal", "Tarjetas", "Menús impresos", "Stickers y empaques", "Vehículo"] }
+  ]},
+  { nav: "Colores y letras", title: "Colores, letras y fotos", intro: "Elija lo que más se acerque. Podrá ver el resultado en la vista previa.", preview: 1, fields: [
+    { k: "palette", t: "palette", label: "Paleta de colores" },
+    { k: "colores", t: "colors", label: "Colores de la marca", help: "Toque cualquier color para ajustarlo a su gusto." },
+    { k: "colores_no", t: "text", label: "¿Hay colores que no quiere usar?" },
+    { k: "font", t: "fonts", label: "Estilo de letra" },
+    { k: "fotos", t: "multi", label: "¿Qué estilo de fotos prefiere?", other: 1, options: ["Luz natural", "Fondo oscuro y elegante", "Platos vistos desde arriba", "El chef cocinando", "Paisajes y entorno", "Ambiente con clientes"] }
+  ]},
+  { nav: "Pantallas", title: "Pantallas y funciones", intro: "Dejamos marcado lo que recomendamos para un chef privado. Quite lo que no necesite y agregue lo que le interese.", fields: [
+    { k: "screens", t: "screens", label: "Pantallas de la página" },
+    { k: "reserva_modo", t: "radio", label: "¿Cómo quiere recibir las reservas?", options: ["Solicitud que yo confirmo", "Solo por WhatsApp", "Reserva con pago inmediato"] },
+    { k: "reserva_reglas", t: "area", label: "Reglas de sus reservas", help: "Días de anticipación, mínimo de personas, depósito, cancelaciones." },
+    { k: "webs_si", t: "area", label: "Páginas web que le gustan y por qué", help: "De chefs, restaurantes, hoteles o de cualquier tema." },
+    { k: "webs_no", t: "area", label: "Páginas web que no le gustan y por qué" }
+  ]},
+  { nav: "Materiales", title: "Materiales y fechas", intro: "Marque lo que ya tiene. Lo que falte lo planificamos juntos.", fields: [
+    { k: "materiales", t: "multi", label: "¿Qué tiene listo?", options: ["Logo en buena calidad", "Fotos de platos", "Fotos suyas", "Menús con precios", "Reseñas de clientes", "Certificados o títulos", "Videos"] },
+    { k: "fotos_plan", t: "radio", label: "¿Necesita una sesión de fotos profesional?", options: ["Sí", "No, tengo buenas fotos", "No estoy seguro"] },
+    { k: "textos", t: "radio", label: "¿Quién escribe los textos de la página?", options: ["Yo los escribo", "Prefiero que los propongan", "Lo hacemos juntos"] },
+    { k: "fecha", t: "date", label: "¿Para cuándo quiere la página lista?" },
+    { k: "aprueba", t: "text", label: "¿Quién aprueba el diseño, además de usted?", help: "Déjelo en blanco si decide solo." },
+    { k: "notas", t: "area", label: "¿Algo más que debamos saber?" }
+  ]},
+  { nav: "Enviar", title: "Revise y envíe", intro: "Esta es su comanda de marca. Hasta que la envíe, sus respuestas solo están en este dispositivo.", fields: [] }
+];
+
+const defaults = () => {
+  const s = { step: 0, palette: "", font: "", logo: "", simbolo: "", c: [...PALETTES[0].c], screens: [] };
+  SCREENS.forEach(g => g.items.forEach(i => { if (i[3]) s.screens.push(i[0]); }));
+  SCALES.forEach(x => { s[x[0]] = 3; });
+  return s;
+};
+
+let state = defaults();
+let storageOk = false;
+try {
+  const raw = localStorage.getItem(KEY);
+  storageOk = true;
+  if (raw) state = { ...state, ...JSON.parse(raw) };
+} catch (e) { storageOk = false; }
+
+const $ = id => document.getElementById(id);
+const esc = v => String(v ?? "").replace(/[&<>"']/g, m => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[m]));
+
+function save() {
+  const el = $("saved");
+  try {
+    localStorage.setItem(KEY, JSON.stringify(state));
+    el.textContent = "Avance guardado en este dispositivo";
+    el.classList.remove("bad");
+  } catch (e) {
+    el.textContent = "Este navegador no guarda el avance. Termine y envíe sin cerrar la página.";
+    el.classList.add("bad");
+  }
+}
+
+const brandName = () => (state.marca || "").trim() || "Su marca";
+const initials = () => brandName().split(/\s+/).filter(w => w.length > 2 || /^[A-ZÁÉÍÓÚÑ]/.test(w)).slice(0, 2).map(w => w[0].toUpperCase()).join("") || "SM";
+const fontOf = () => FONTS.find(f => f.v === state.font) || FONTS[0];
+const stack = (name, cat) => `'${name}', ${cat === "cursive" ? "cursive" : cat}`;
+
+function logoHTML(type) {
+  const f = fontOf();
+  const icon = svg(state.simbolo || "gorro");
+  const st = `style="font-family:${stack(f.a, f.cat)}"`;
+  if (type === "monograma") return `<span class="lg mono" ${st}>${esc(initials())}</span>`;
+  if (type === "sello") return `<span class="lg seal" ${st}>${icon}<span class="nm">${esc(brandName())}</span></span>`;
+  if (type === "logotipo") return `<span class="lg" ${st}><span class="nm">${esc(brandName())}</span></span>`;
+  return `<span class="lg" ${st}>${icon}<span class="nm">${esc(brandName())}</span></span>`;
+}
+
+const lum = hex => {
+  const n = [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16) / 255).map(v => v <= .03928 ? v / 12.92 : ((v + .055) / 1.055) ** 2.4);
+  return .2126 * n[0] + .7152 * n[1] + .0722 * n[2];
+};
+const onColor = hex => lum(hex) > .35 ? "#111111" : "#FFFFFF";
+
+function renderPreview() {
+  const [bg, ink, pri, acc] = state.c;
+  const f = fontOf();
+  const line = (state.eslogan || "").trim() || "Cocina de autor en la comodidad de su casa";
+  const site = $("site");
+  site.style.background = bg;
+  site.style.color = ink;
+  site.style.fontFamily = stack(f.b, "sans-serif");
+  site.innerHTML = `
+    <div class="site-nav"><span class="logo-mini" style="color:${pri}">${logoHTML(state.logo || "imagotipo")}</span><span>Menú · Reservar</span></div>
+    <div class="site-hero">
+      <h4 style="font-family:${stack(f.a, f.cat)}">${esc(line)}</h4>
+      <p>${esc((state.base || "").trim() ? "Chef privado en " + state.base.trim() : "Chef privado a domicilio")}</p>
+      <span class="site-cta" style="background:${pri};color:${onColor(pri)}">Reservar fecha</span>
+    </div>
+    <div class="site-tiles"><i style="background:${pri}"></i><i style="background:${acc}"></i><i style="background:${ink};opacity:.85"></i></div>`;
+  $("mock-url").textContent = (state.dominio_txt || "").trim() || "suchef.com";
+}
+
+const opt = (type, k, v, checked, inner, cls) =>
+  `<label class="${cls}"><input type="${type}" id="${k}-${v}" name="${k}" data-k="${k}" value="${esc(v)}"${checked ? " checked" : ""}>${inner}</label>`;
+const slug = v => v.normalize("NFD").replace(/[^\w]+/g, "-").toLowerCase();
+
+function fieldHTML(f) {
+  const req = f.req ? '<span class="req">necesario</span>' : "";
+  const help = f.help ? `<p class="help">${esc(f.help)}</p>` : "";
+  const v = state[f.k];
+  const group = body => `<fieldset class="field" data-field="${f.k}"><legend>${esc(f.label)}${req}</legend>${help}${body}</fieldset>`;
+  switch (f.t) {
+    case "area":
+      return `<div class="field" data-field="${f.k}"><label class="label" for="${f.k}">${esc(f.label)}${req}</label>${help}<textarea id="${f.k}" data-k="${f.k}" placeholder="${esc(f.ph || "")}">${esc(v)}</textarea></div>`;
+    case "radio":
+      return group(`<div class="chips">${f.options.map(o => `<label class="chip"><input type="radio" id="${f.k}-${slug(o)}" name="${f.k}" data-k="${f.k}" value="${esc(o)}"${v === o ? " checked" : ""}>${esc(o)}</label>`).join("")}</div>`);
+    case "multi": {
+      const sel = v || [];
+      const other = f.other ? `<input type="text" id="${f.k}_otro" data-k="${f.k}_otro" placeholder="Otro" aria-label="Otro: ${esc(f.label)}" value="${esc(state[f.k + "_otro"])}">` : "";
+      return group(`<div class="chips">${f.options.map(o => `<label class="chip"><input type="checkbox" id="${f.k}-${slug(o)}" data-k="${f.k}" value="${esc(o)}"${sel.includes(o) ? " checked" : ""}>${esc(o)}</label>`).join("")}</div>${other}`);
+    }
+    case "scale":
+      return group(`<div class="scale">${SCALES.map(([k, a, b]) => `<div class="scale-row"><span>${a}</span><span>${b}</span><input type="range" id="${k}" data-k="${k}" min="1" max="5" step="1" value="${state[k]}" aria-label="De ${a} a ${b}"></div>`).join("")}</div>`);
+    case "logo":
+      return group(`<div class="cards">${LOGOS.map(l => opt("radio", "logo", l.v, v === l.v, `<span class="logo-box" data-logo="${l.v}"></span><b>${l.l}</b><small>${l.d}</small>`, "card")).join("")}</div>`);
+    case "symbol":
+      return group(`<div class="cards" style="grid-template-columns:repeat(auto-fill,minmax(112px,1fr))">${SYMBOLS.map(x => opt("radio", "simbolo", x.v, v === x.v, `<span class="sym">${svg(x.v)}<small>${x.l}</small></span>`, "card")).join("")}</div>`);
+    case "palette":
+      return group(`<div class="cards">${PALETTES.map(p => opt("radio", "palette", p.v, v === p.v, `<span class="swatches">${p.c.map(c => `<i style="background:${c}"></i>`).join("")}</span><b>${p.l}</b>`, "card")).join("")}</div>`);
+    case "colors":
+      return group(`<div class="colors">${COLOR_NAMES.map((n, i) => `<label class="color"><input type="color" id="color-${i}" data-c="${i}" value="${state.c[i]}" aria-label="${n}"><div>${n}<br><code id="hex-${i}">${state.c[i].toUpperCase()}</code></div></label>`).join("")}</div>`);
+    case "fonts":
+      return group(`<div class="cards">${FONTS.map(x => opt("radio", "font", x.v, v === x.v, `<span class="font-a" data-font-name style="font-family:${stack(x.a, x.cat)}"></span><span class="font-b" style="font-family:${stack(x.b, "sans-serif")}">Ceviche de corvina con limón mandarina</span><b>${x.l}</b>`, "card")).join("")}</div>`);
+    case "screens":
+      return group(SCREENS.map(g => `<div class="group"><h3>${g.g}</h3>${g.items.map(([id, l, d]) => `<label class="check"><input type="checkbox" id="scr-${id}" data-k="screens" value="${id}"${state.screens.includes(id) ? " checked" : ""}><b>${esc(l)}</b><small>${esc(d)}</small></label>`).join("")}</div>`).join(""));
+    default:
+      return `<div class="field" data-field="${f.k}"><label class="label" for="${f.k}">${esc(f.label)}${req}</label>${help}<input type="${f.t}" id="${f.k}" data-k="${f.k}" placeholder="${esc(f.ph || "")}" value="${esc(v)}"></div>`;
+  }
+}
+
+function ticketHTML() {
+  const miss = missing();
+  const warn = miss.length ? `<div class="missing"><p>Faltan ${miss.length === 1 ? "1 respuesta necesaria" : miss.length + " respuestas necesarias"}</p>${miss.map(m => `<button type="button" data-go="${m.step}">${esc(m.label)}</button>`).join("")}</div>` : "";
+  return `${warn}
+    <section class="ticket" aria-label="Resumen de sus respuestas">
+      <div class="ticket-head"><span>Comanda de marca</span><span>${esc(today())}</span></div>
+      <pre id="ticket" tabindex="0"></pre>
+    </section>
+    <ol class="how">
+      <li>Toque <b>Copiar respuestas</b>.</li>
+      <li>Péguelas en un mensaje de WhatsApp o en un correo para su diseñador.</li>
+      <li>Envíe en ese mismo mensaje su logo actual, sus fotos y sus menús.</li>
+    </ol>
+    <div class="send">
+      <button type="button" class="btn" id="copy">Copiar respuestas</button>
+      <button type="button" class="btn ghost" id="download" hidden>Descargar archivo</button>
+    </div>
+    <p class="status" id="status" role="status"></p>`;
+}
+
+function render() {
+  const i = state.step;
+  const step = STEPS[i];
+  const last = i === STEPS.length - 1;
+  $("steps").innerHTML = STEPS.map((s, n) => `<button type="button" data-go="${n}"${n === i ? ' aria-current="step"' : ""}><span>${n + 1}</span>${esc(s.nav)}</button>`).join("");
+  $("form").innerHTML = `
+    <div class="head"><p class="eyebrow">Paso ${i + 1} de ${STEPS.length}</p><h2 id="title" tabindex="-1">${esc(step.title)}</h2><p>${esc(step.intro)}</p></div>
+    ${step.fields.map(fieldHTML).join("")}
+    ${last ? ticketHTML() : ""}
+    <div class="nav">
+      ${i > 0 ? `<button type="button" class="btn ghost" data-go="${i - 1}">Atrás</button>` : "<span></span>"}
+      ${last ? '<button type="button" class="btn quiet" id="reset">Borrar todo y empezar de nuevo</button>' : `<button type="button" class="btn" data-go="${i + 1}">${i === STEPS.length - 2 ? "Revisar respuestas" : "Siguiente"}</button>`}
+    </div>`;
+  $("aside").classList.toggle("on-phone", !!step.preview);
+  const current = $("steps").querySelector('[aria-current="step"]');
+  $("steps").scrollLeft = current.offsetLeft - $("steps").offsetLeft - 16;
+  refresh();
+  if (last) setupDownload();
+}
+
+function refresh() {
+  STEPS[state.step].fields.forEach(f => {
+    if (!f.show) return;
+    const el = document.querySelector(`[data-field="${f.k}"]`);
+    if (el) el.hidden = !f.show(state);
+  });
+  document.querySelectorAll("[data-logo]").forEach(el => {
+    const [bg, , pri] = state.c;
+    el.style.background = bg;
+    el.style.color = pri;
+    el.innerHTML = logoHTML(el.dataset.logo);
+  });
+  document.querySelectorAll("[data-font-name]").forEach(el => { el.textContent = brandName(); });
+  renderPreview();
+  const t = $("ticket");
+  if (t) t.textContent = summary();
+}
+
+const today = () => new Date().toLocaleDateString("es-CR", { day: "numeric", month: "long", year: "numeric" });
+
+function missing() {
+  const out = [];
+  STEPS.forEach((s, n) => s.fields.forEach(f => {
+    if (f.req && !(state[f.k] || "").trim()) out.push({ step: n, label: f.label });
+  }));
+  return out;
+}
+
+function fmt(f) {
+  const v = state[f.k];
+  switch (f.t) {
+    case "multi": {
+      const all = [...(v || [])];
+      const o = (state[f.k + "_otro"] || "").trim();
+      if (o) all.push(o);
+      return all.join(", ");
+    }
+    case "scale":
+      if (SCALES.every(([k]) => state[k] === 3)) return "";
+      return "\n" + SCALES.map(([k, a, b]) => {
+        const n = state[k];
+        const word = n === 3 ? "en el medio" : (n < 3 ? a : b) + (n === 1 || n === 5 ? " (mucho)" : " (algo)");
+        return `  ${a} / ${b}: ${word}`;
+      }).join("\n");
+    case "logo": return (LOGOS.find(x => x.v === v) || {}).l || "";
+    case "symbol": return (SYMBOLS.find(x => x.v === v) || {}).l || "";
+    case "palette": return v === "propia" ? "Colores propios" : (PALETTES.find(x => x.v === v) || {}).l || "";
+    case "colors":
+      return state.palette ? COLOR_NAMES.map((n, i) => `${n} ${state.c[i].toUpperCase()}`).join(" · ") : "";
+    case "fonts": {
+      const x = FONTS.find(y => y.v === v);
+      return x ? `${x.l} (${x.a} + ${x.b})` : "";
+    }
+    case "screens":
+      return "\n" + SCREENS.map(g => {
+        const on = g.items.filter(i => state.screens.includes(i[0])).map(i => "  - " + i[1]);
+        return on.length ? `  ${g.g}:\n${on.join("\n")}` : "";
+      }).filter(Boolean).join("\n");
+    default: return (v || "").trim();
+  }
+}
+
+function summary() {
+  const out = [`IDENTIDAD DE MARCA: ${brandName()}`, `Fecha: ${today()}`];
+  STEPS.forEach(s => {
+    const lines = s.fields.filter(f => !f.show || f.show(state)).map(f => [f, fmt(f)]).filter(x => x[1]).map(([f, val]) => `${f.label}: ${val}`);
+    if (s.fields.length) out.push("", `--- ${s.title.toUpperCase()} ---`, ...(lines.length ? lines : ["(sin responder)"]));
+  });
+  return out.join("\n");
+}
+
+function setStatus(text, bad) {
+  const el = $("status");
+  el.textContent = text;
+  el.classList.toggle("bad", !!bad);
+}
+
+function setupDownload() {
+  const btn = $("download");
+  btn.hidden = false;
+  btn.onclick = () => {
+    const url = URL.createObjectURL(new Blob([summary()], { type: "text/plain;charset=utf-8" }));
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `marca-${slug(brandName())}.txt`;
+    a.click();
+    URL.revokeObjectURL(url);
+    setStatus("Archivo descargado. Envíelo a su diseñador.");
+  };
+}
+
+$("form").addEventListener("submit", e => e.preventDefault());
+
+$("form").addEventListener("input", e => {
+  const el = e.target;
+  if (el.dataset.c !== undefined) {
+    const i = Number(el.dataset.c);
+    state.c[i] = el.value;
+    $("hex-" + i).textContent = el.value.toUpperCase();
+    state.palette = "propia";
+    document.querySelectorAll('input[name="palette"]').forEach(r => { r.checked = false; });
+  } else if (el.dataset.k) {
+    const k = el.dataset.k;
+    if (el.type === "checkbox") {
+      const list = new Set(state[k] || []);
+      el.checked ? list.add(el.value) : list.delete(el.value);
+      state[k] = [...list];
+    } else if (el.type === "range") {
+      state[k] = Number(el.value);
+    } else {
+      state[k] = el.value;
+    }
+    if (k === "palette") {
+      state.c = [...PALETTES.find(p => p.v === el.value).c];
+      state.c.forEach((c, i) => {
+        const input = $("color-" + i);
+        if (input) { input.value = c; $("hex-" + i).textContent = c.toUpperCase(); }
+      });
+    }
+  } else return;
+  save();
+  refresh();
+});
+
+document.addEventListener("click", async e => {
+  const go = e.target.closest("[data-go]");
+  if (go) {
+    state.step = Number(go.dataset.go);
+    save();
+    render();
+    window.scrollTo(0, 0);
+    $("title").focus({ preventScroll: true });
+    return;
+  }
+  if (e.target.id === "copy") {
+    const text = summary();
+    try {
+      await navigator.clipboard.writeText(text);
+      setStatus("Copiado. Ahora péguelo en WhatsApp o en un correo.");
+    } catch (err) {
+      const r = document.createRange();
+      r.selectNodeContents($("ticket"));
+      const sel = getSelection();
+      sel.removeAllRanges();
+      sel.addRange(r);
+      setStatus("No se pudo copiar solo. El texto quedó seleccionado: cópielo con el menú de su teléfono o con Ctrl+C.", true);
+    }
+    return;
+  }
+  if (e.target.id === "reset") {
+    const b = e.target;
+    if (b.dataset.armed) {
+      state = defaults();
+      save();
+      render();
+      window.scrollTo(0, 0);
+      return;
+    }
+    b.dataset.armed = "1";
+    b.textContent = "Toque otra vez para borrar todo";
+    setTimeout(() => { delete b.dataset.armed; b.textContent = "Borrar todo y empezar de nuevo"; }, 4000);
+  }
+});
+
+$("saved").textContent = storageOk ? "Su avance se guarda solo en este dispositivo" : "Este navegador no guarda el avance. Termine y envíe sin cerrar la página.";
+$("saved").classList.toggle("bad", !storageOk);
+render();
+</script>
+</body>
+</html>
