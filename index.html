@@ -132,6 +132,7 @@ input:focus-visible, textarea:focus-visible, button:focus-visible, a:focus-visib
   background: var(--accent); color: var(--accent-ink); font: 600 1rem var(--body);
 }
 .btn:hover { filter: brightness(1.08); }
+.btn:disabled { opacity: .6; cursor: default; filter: none; }
 .btn.ghost { background: transparent; color: var(--ink); border-color: var(--line); }
 .btn.ghost:hover { border-color: var(--accent); }
 .btn.quiet { border-color: transparent; background: transparent; color: var(--muted); font-weight: 500; font-size: .875rem; padding-inline: 8px; }
@@ -213,6 +214,8 @@ aside .note { margin: 0; font-size: .8rem; color: var(--muted); }
 
 <script>
 const KEY = "brief-marca-chef-v1";
+const SUPABASE_URL = "https://hvxbxllbljqtpnsfuoke.supabase.co";
+const SUPABASE_KEY = "sb_publishable_CM5LgFlDxkCDiMcLjYNopw_h9RpngHK";
 
 const ICONS = {
   gorro: '<path d="M7 14.5a4 4 0 1 1 1.3-7.8 4.5 4.5 0 0 1 7.4 0A4 4 0 1 1 17 14.5V20H7z"/><path d="M7 17h10"/>',
@@ -466,15 +469,16 @@ function ticketHTML() {
       <pre id="ticket" tabindex="0"></pre>
     </section>
     <ol class="how">
-      <li>Toque <b>Copiar respuestas</b>.</li>
-      <li>Péguelas en un mensaje de WhatsApp o en un correo para su diseñador.</li>
-      <li>Envíe en ese mismo mensaje su logo actual, sus fotos y sus menús.</li>
+      <li>Toque <b>Enviar respuestas</b>.</li>
+      <li>Mándele a su diseñador, por WhatsApp o correo, su logo actual, sus fotos y sus menús.</li>
     </ol>
     <div class="send">
-      <button type="button" class="btn" id="copy">Copiar respuestas</button>
+      <button type="button" class="btn" id="send">Enviar respuestas</button>
+      <button type="button" class="btn ghost" id="copy">Copiar respuestas</button>
       <button type="button" class="btn ghost" id="download" hidden>Descargar archivo</button>
     </div>
-    <p class="status" id="status" role="status"></p>`;
+    <p class="status" id="status" role="status"></p>
+    <p class="help">Si no logra enviar, use <b>Copiar respuestas</b> y péguelas en un mensaje para su diseñador.</p>`;
 }
 
 function render() {
@@ -513,6 +517,46 @@ function refresh() {
   renderPreview();
   const t = $("ticket");
   if (t) t.textContent = summary();
+  updateSend();
+}
+
+const answers = () => {
+  const { step, enviado, ...rest } = state;
+  return rest;
+};
+const isSent = () => state.enviado === JSON.stringify(answers());
+
+function updateSend() {
+  const btn = $("send");
+  if (!btn) return;
+  btn.disabled = isSent();
+  btn.textContent = isSent() ? "Respuestas enviadas" : state.enviado ? "Enviar cambios" : "Enviar respuestas";
+}
+
+async function send() {
+  if (missing().length) {
+    setStatus("Complete las respuestas necesarias que aparecen arriba y vuelva a enviar.", true);
+    return;
+  }
+  const btn = $("send");
+  btn.disabled = true;
+  btn.textContent = "Enviando…";
+  setStatus("");
+  try {
+    const res = await fetch(SUPABASE_URL + "/rest/v1/respuestas_marca", {
+      method: "POST",
+      headers: { apikey: SUPABASE_KEY, "Content-Type": "application/json", Prefer: "return=minimal" },
+      body: JSON.stringify({ marca: state.marca, chef: state.chef, whatsapp: state.whatsapp, resumen: summary(), respuestas: answers() })
+    });
+    if (!res.ok) throw new Error(res.status);
+    state.enviado = JSON.stringify(answers());
+    save();
+    updateSend();
+    setStatus("Listo, recibimos sus respuestas. Ya puede cerrar esta página.");
+  } catch (e) {
+    updateSend();
+    setStatus("No se pudo enviar. Revise su internet e intente otra vez, o use Copiar respuestas.", true);
+  }
 }
 
 const today = () => new Date().toLocaleDateString("es-CR", { day: "numeric", month: "long", year: "numeric" });
@@ -629,6 +673,10 @@ document.addEventListener("click", async e => {
     render();
     window.scrollTo(0, 0);
     $("title").focus({ preventScroll: true });
+    return;
+  }
+  if (e.target.id === "send") {
+    send();
     return;
   }
   if (e.target.id === "copy") {
